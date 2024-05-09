@@ -17,15 +17,15 @@ if($requestMethod === "GET") {
     $controller->getUserById($id);
 }
 if ($requestMethod === "POST") {
-    $user = $_POST["user"];
+    $user = json_decode(file_get_contents("php://input"));
     $controller->createUser($user);
 }
 if ($requestMethod === "PUT") {
-    $user = $_POST["user"];
+    $user = json_decode(file_get_contents("php://input"));
     $controller->updateUser($user);
 }
 if ($requestMethod === "DELETE") {
-    $user = $_POST["id"];
+    $user = json_decode(file_get_contents("php://input"));
     $controller->deleteUser($user);
 }
 
@@ -53,16 +53,39 @@ class UserController
 
     public function createUser($user)
     {
-
+        if(isset($user)){
+            $this->userRepo->addUser($user);
+            http_response_code(200);
+            echo json_encode(["message" => "User created"]);
+        } else {
+            http_response_code(400);
+            echo json_encode(["message" => "User not created"]);
+        }
     }
 
     public function updateUser($user)
     {
-
+        if(isset($user)){
+            $this->userRepo->updateUser($user);
+            http_response_code(200);
+            echo json_encode(["message" => "User updated"]);
+        } else {
+            http_response_code(400);
+            echo json_encode(["message" => "User not updated"]);
+        }
     }
 
     public function deleteUser($user)
     {
-
+        $data = $user->id;
+        echo $data;
+        if(isset($data)){
+            $this->userRepo->deleteUser($data);
+            http_response_code(200);
+            echo json_encode(["message" => "User deleted"]);
+        } else {
+            http_response_code(404);
+            echo json_encode(["message" => "User not found"]);
+        }
     }
 }
